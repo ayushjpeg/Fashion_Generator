@@ -12,7 +12,7 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 
 # Variables
-entries = ["Hello"]
+entries = []
 user_preferences = {
     'color': None,
     'clothing': None,
