@@ -14,7 +14,7 @@
 body{
     /*background-color: rgb(28, 28, 30);
     color: rgb(240,240,200);*/
-      background-image: url('../images/background.png');
+      background-image: url('images/background.png');
       background-size: cover;
 
 
