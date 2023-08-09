@@ -4,7 +4,8 @@ import nltk
 from nltk.chat.util import Chat, reflections
 from support import Fashion_array
 import re
-
+import requests
+from bs4 import BeautifulSoup
 # Configure application
 app = Flask(__name__, static_folder='static', template_folder='templates')
 
@@ -76,6 +77,28 @@ def index():
 
     else:
         return render_template("index.html", entries=entries)
+
+
+@app.route('/search/<query>')
+def search(query):
+    # Fetch search results from Flipkart
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+    }
+    url = f"https://www.flipkart.com/search?q={query}"
+    response = requests.get(url, headers=headers)
+    soup = BeautifulSoup(response.content, 'html.parser')
+
+    # Extract product details
+    product_details = []
+    for product in soup.select('.YOUR_PRODUCT_CLASS_NAME'):
+        title = product.text
+        link = product.find('a')['href']
+        product_details.append({'title': title, 'link': link})
+    print(product_details, query)
+
+    return render_template('search_results.html', query=query, results=product_details)
+
 
 
 

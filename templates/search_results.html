@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Results</title>
+</head>
+<body>
+    <h1>Search Results for "{{ query }}"</h1>
+    <ul>
+        {% for result in results %}
+        <li>
+            <a href="{{ result.link }}" target="_blank">{{ result.title }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
