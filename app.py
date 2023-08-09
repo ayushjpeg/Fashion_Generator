@@ -12,6 +12,7 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 
 # Variables
+entries = ["Hello"]
 fashion_patterns = [
     (r'hi|hello', ['Hello!', 'Hi there!', 'Hey!']),
     (r'bye|goodbye', ['Goodbye!', 'See you later!', 'Bye!']),
@@ -22,6 +23,9 @@ fashion_patterns = [
     (r'(.*)', ['I hear you. Tell me more about fashion.', 'Fashion is fascinating! Could you tell me more?'])
 ]
 
+# Chatbot config
+fashion_chatbot = Chat(fashion_patterns, reflections)
+
 # Ensuring responses are not cached
 @app.after_request
 def after_request(response):
@@ -30,10 +34,24 @@ def after_request(response):
     response.headers["Pragma"] = "no-cache"
     return response
 
-@app.route('/')
+@app.route('/',methods=["GET", "POST"])
 def index():
-    return render_template("index.html")
+    global entries  
+    if request.method == "POST":
+        s = request.form.get("Entry")
+        entries.append(s)
+        print(s)
+        response_of_bot = fashion_chatbot.respond(str(s))
+        entries.append(response_of_bot)
+        print(entries)
+        return render_template("index.html", entries=entries)
+
+    else:
+        return render_template("index.html", entries=entries)
+
+
+
 
 if __name__ == '__main__':
     # Run the app on all network interfaces on port 5000
-    app.run(host='0.0.0.0',port = 1030, debug=True)
+    app.run(host='0.0.0.0',port = 1040, debug=True)
