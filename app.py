@@ -4,7 +4,8 @@ import nltk
 from nltk.chat.util import Chat, reflections
 
 # Configure application
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', template_folder='templates')
+
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -35,4 +36,4 @@ def index():
 
 if __name__ == '__main__':
     # Run the app on all network interfaces on port 5000
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
