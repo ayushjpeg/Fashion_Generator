@@ -16,6 +16,8 @@ body{
   color: rgb(240,240,200);*/
     background-image: url('images/background3.png');
     background-size: cover;
+    background-position: center;
+    height: 100vh;
 }
 
 form
