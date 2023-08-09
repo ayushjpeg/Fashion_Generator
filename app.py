@@ -13,6 +13,12 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 # Variables
 entries = ["Hello"]
+user_preferences = {
+    'color': None,
+    'clothing': None,
+    'brands': None,
+    'style': None
+}
 fashion_patterns = [
     (r'hi|hello', ['Hello!', 'Hi there!', 'Hey!']),
     (r'bye|goodbye', ['Goodbye!', 'See you later!', 'Bye!']),
@@ -54,4 +60,4 @@ def index():
 
 if __name__ == '__main__':
     # Run the app on all network interfaces on port 5000
-    app.run(host='0.0.0.0',port = 1040, debug=True)
+    app.run(host='0.0.0.0',port = 1050, debug=True)
