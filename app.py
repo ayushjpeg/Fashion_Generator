@@ -35,9 +35,9 @@ def index():
     global entries  
     if request.method == "POST":
         s = request.form.get("Entry")
-        entries.append(s)
+        entries.append("USER : "+s)
         response_of_bot = fashion_chatbot.respond(str(s))
-        entries.append(response_of_bot)
+        entries.append("BOT : "+response_of_bot)
         try:
             for pattern, _ in fashion_patterns:
                 match = nltk.re.search(pattern, str(s))
@@ -47,10 +47,6 @@ def index():
                         # Determine the category based on the pattern used
                         if 'wear'  in pattern:
                             category = 'clothing'
-                        elif 'accessory' in pattern:
-                            category = 'accessories'
-                        elif 'foot' in pattern:
-                            category = 'footwear'
                         elif 'color' in pattern:
                             category = 'colors'
                         elif 'material' in pattern:
@@ -61,7 +57,6 @@ def index():
                             category = 'brands'
                         else:
                             category = 'other'  # Modify this as needed
-                            
                         if category not in user_preferences:
                             user_preferences[category] = []
                         user_preferences[category].append(preference)  # Store the preference in the dictionary
@@ -71,11 +66,11 @@ def index():
             
         except:
             entries.append("I was expecting something more detailed about your likings.")
-        print(user_preferences)
             
         return render_template("index.html", entries=entries)
 
     else:
+        entries=[]
         return render_template("index.html", entries=entries)
 
 
