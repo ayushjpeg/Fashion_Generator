@@ -98,7 +98,7 @@ def search(query):
     print(product_details, query)
 
     return render_template('search_results.html', query=query, results=product_details)
-
+ 
 
 
 
