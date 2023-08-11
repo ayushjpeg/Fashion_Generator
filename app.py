@@ -6,6 +6,30 @@ from support import Fashion_array
 import re
 import requests
 from bs4 import BeautifulSoup
+
+
+
+def search_flipkart(query):
+    url = f'https://www.flipkart.com/search?q={query}&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off'
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+    return soup
+
+def fetch_product_details(link):
+    response = requests.get(link)
+    soup = BeautifulSoup(response.content, 'html.parser')
+
+    # Extract product details (customize based on the actual structure)
+    product_title = soup.find('span', {'class': 'B_NuCI'}).text
+    product_price = soup.find('div', {'class': '_30jeq3 _16Jk6d'}).text
+    product_image = soup.find('img', {'class': '_2r_T1I _396QI4'})['src']
+
+    return {
+        'title': product_title,
+        'price': product_price,
+        'image': product_image,
+    }
+
 # Configure application
 app = Flask(__name__, static_folder='static', template_folder='templates')
 
@@ -57,21 +81,38 @@ def index():
                             category = 'brands'
                         else:
                             category = 'other'  # Modify this as needed
-                        if category not in user_preferences:
-                            user_preferences[category] = []
-                        user_preferences[category].append(preference)  # Store the preference in the dictionary
+                        user_preferences[category] = (preference)  # Store the preference in the dictionary
                         
                         entries.append(f"I'll remember that you enjoy {preference} in {category}.")
                     break
             
         except:
             entries.append("I was expecting something more detailed about your likings.")
-            
-        return render_template("index.html", entries=entries)
+        search_criteria = user_preferences
+        print(search_criteria)
+        search_query = ' '.join(search_criteria.values())
+        search_results = search_flipkart(search_query)
+
+        top_links = []
+        products = search_results.find_all('div', {'class': '_1AtVbE'})
+        for product in products:
+            link_element = product.find('a', {'class': 'IRpwTa'})
+            if link_element:
+                link = 'https://www.flipkart.com' + link_element['href']
+                top_links.append(link)
+        product_details = []
+        for link in top_links:
+            try:
+                details = fetch_product_details(link)
+                product_details.append(details)
+            except:
+                continue
+
+        return render_template("index.html", entries=entries,product_details=product_details)
 
     else:
         entries=[]
-        return render_template("index.html", entries=entries)
+        return render_template("index.html", entries=entries,  top_links=[])
 
 
 @app.route('/search/<query>')

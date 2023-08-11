@@ -36,4 +36,40 @@
         
     </div>
 </div>
+
+<h1>Top Flipkart Products</h1>
+<div id="products-container"></div>
+
+<script>
+    const productsContainer = document.getElementById('products-container');
+    const productDetails = [
+        {% for details in product_details %}
+            {
+                title: "{{ details.title }}",
+                price: "{{ details.price }}",
+                image: "{{ details.image }}"
+            },
+        {% endfor %}
+    ];
+
+    productDetails.forEach(details => {
+        const productItem = document.createElement('div');
+        productItem.className = 'product-item';
+
+        const productTitle = document.createElement('h2');
+        productTitle.textContent = details.title;
+
+        const productPrice = document.createElement('p');
+        productPrice.textContent = `Price: ${details.price}`;
+
+        const productImage = document.createElement('img');
+        productImage.src = details.image;
+        productImage.alt = details.title;
+
+        productItem.appendChild(productTitle);
+        productItem.appendChild(productPrice);
+        productItem.appendChild(productImage);
+        productsContainer.appendChild(productItem);
+    });
+</script>
 {% endblock %}
