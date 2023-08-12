@@ -1,13 +1,13 @@
-import random, os, sys
-from flask import Flask, redirect, render_template, request
+from flask import Flask, redirect, render_template, request, session
 import nltk
 from nltk.chat.util import Chat, reflections
-from support import Fashion_array
-import re
 import requests
+from flask_session import Session
 from bs4 import BeautifulSoup
-
-
+from werkzeug.security import check_password_hash, generate_password_hash
+from helpers import apology, login_required
+from support import Fashion_array
+import sqlite3
 
 def search_flipkart(query):
     url = f'https://www.flipkart.com/search?q={query}&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off'
@@ -36,6 +36,16 @@ app = Flask(__name__, static_folder='static', template_folder='templates')
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
+
+
+# Configure session to use filesystem (instead of signed cookies)
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
+Session(app)
+id = ''
+
+
+
 
 
 # Variables
@@ -68,7 +78,6 @@ def index():
                 if match:
                     preference = match.group(1)
                     if preference:
-                        # Determine the category based on the pattern used
                         if 'wear'  in pattern:
                             category = 'clothing'
                         elif 'color' in pattern:
@@ -80,14 +89,14 @@ def index():
                         elif 'brand' in pattern:
                             category = 'brands'
                         else:
-                            category = 'other'  # Modify this as needed
-                        user_preferences[category] = (preference)  # Store the preference in the dictionary
+                            category = 'other'  
+                        user_preferences[category] = (preference)  
                         
                         entries.append(f"I'll remember that you enjoy {preference} in {category}.")
                     break
-            
         except:
             entries.append("I was expecting something more detailed about your likings.")
+        
         search_criteria = user_preferences
         print(search_criteria)
         search_query = ' '.join(search_criteria.values())
@@ -115,30 +124,95 @@ def index():
         return render_template("index.html", entries=entries,  top_links=[])
 
 
-@app.route('/search/<query>')
-def search(query):
-    # Fetch search results from Flipkart
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
-    }
-    url = f"https://www.flipkart.com/search?q={query}"
-    response = requests.get(url, headers=headers)
-    soup = BeautifulSoup(response.content, 'html.parser')
 
-    # Extract product details
-    product_details = []
-    for product in soup.select('.YOUR_PRODUCT_CLASS_NAME'):
-        title = product.text
-        link = product.find('a')['href']
-        product_details.append({'title': title, 'link': link})
-    print(product_details, query)
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    session.clear()
 
-    return render_template('search_results.html', query=query, results=product_details)
+    if request.method == "POST":
+        
+        # Database
+        conn = sqlite3.connect("userdata.db")
+        db = conn.cursor()
+        
+        
+        if not request.form.get("username"):
+            return apology("must provide username", 403)
+        elif not request.form.get("password"):
+            return apology("must provide password", 403)
+        username_to_search = request.form.get("username")
+        
+        db.execute("SELECT * FROM users WHERE username = ?", (username_to_search,))
+        
+        rows = db.fetchall()
+        
+        print(rows)
+        
+        if len(rows) != 1 or not check_password_hash(rows[0][2], request.form.get("password")):
+            return apology("invalid username and/or password", 403)
+
+        session["user_id"] = rows[0][0]
+        
+        conn.close()
+        
+        return redirect("/")
+    else:
+        return render_template("login.html")
+
  
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/")
 
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    session.clear()
+    if request.method == "POST":
+        
+        
+        # Database
+        conn = sqlite3.connect("userdata.db")
+        db = conn.cursor()
+
+        if (not request.form.get("username")) or request.form.get("username") == "" or request.form.get("username") == None:
+            return apology("Username cannot be left blank")
+
+        if (not request.form.get("password")) or request.form.get("password") == "" or request.form.get("password") == None:
+            return apology("Password cannot be left blank")
+
+        if (not request.form.get("confirmation")) or request.form.get("confirmation") == None:
+            return apology("Password confirmation cannot be left blank")
+        
+        if request.form.get("password") != request.form.get("confirmation"):
+            return apology("Password and confirm password dont match")
+
+        username_to_search = request.form.get("username")
+        db.execute("SELECT * FROM users WHERE username = ?", (username_to_search,))
+        
+        rows = db.fetchall()
+
+        if len(rows) > 0:
+            return apology("Username already exists")
+        
+        username = request.form.get("username")
+        hashed_password = generate_password_hash(request.form.get("password"))
+        db.execute("INSERT INTO users (username, hash) VALUES (?, ?)", (username, hashed_password))
+        conn.commit()
+
+        db.execute("SELECT id FROM users WHERE username = ?", (username,))
+        user_id = db.fetchone()[0]
+
+        session["user_id"] = user_id
+        
+        conn.close()
+        
+        return redirect('/')
+    else:
+        return render_template("register.html")
 
 
 
 if __name__ == '__main__':
-    # Run the app on all network interfaces on port 5000
     app.run(host='0.0.0.0',port = 5050, debug=True)
