@@ -160,7 +160,7 @@ a {
 /* Section b */
 .section-b {
     padding: 50px 0;
-    height: 600px;
+    height: 350px;
     position: relative;
 }
 
@@ -178,8 +178,8 @@ a {
 }
 
 .section-b-inner h2 {
-    font-size: 5rem;
-    margin-top: 1rem;
+    font-size: 3rem;
+    margin-top: .5rem;
 }
 
 .section-b-inner h3 {
@@ -188,7 +188,7 @@ a {
 
 .section-b-inner p {
     font-size: 1.5rem;
-    margin-top: 1rem;
+    margin-top: .5rem;
 }
 
 /* Gallery */
