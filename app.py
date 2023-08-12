@@ -64,7 +64,11 @@ def after_request(response):
     response.headers["Pragma"] = "no-cache"
     return response
 
-@app.route('/',methods=["GET", "POST"])
+@app.route('/',methods=["GET","POST"])
+def front():
+    return render_template("front.html")
+
+@app.route('/index',methods=["GET", "POST"])
 def index():
     global entries  
     if request.method == "POST":
@@ -155,7 +159,7 @@ def login():
         
         conn.close()
         
-        return redirect("/")
+        return redirect("/index")
     else:
         return render_template("login.html")
 
