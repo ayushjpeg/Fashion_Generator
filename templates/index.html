@@ -39,7 +39,12 @@
 </div>
 
 <style>
+
+
     .product-item {
+        text-decoration: none;
+        color: inherit; /* Inherit the parent element's color */
+        cursor: pointer; 
         flex-basis: 33.33%;
         padding: 10px;
         box-sizing: border-box;
@@ -47,6 +52,7 @@
     }
 
     .product-item:hover {
+        text-decoration: underline;
         transform: scale(1.1);
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         padding: 50px; /* Adjust this value as needed */
@@ -66,14 +72,17 @@
             {
                 title: "{{ details.title }}",
                 price: "{{ details.price }}",
-                image: "{{ details.image }}"
+                image: "{{ details.image }}",
+                link: "{{ details.link }}"
             },
         {% endfor %}
     ];
 
     productDetails.forEach(details => {
-        const productItem = document.createElement('div');
+        const productItem = document.createElement('a'); // Change to anchor element
+        productItem.href = details.link;
         productItem.className = 'product-item';
+        productItem.target = '_blank'; // Open link in a new tab
 
         const productTitle = document.createElement('h2');
         productTitle.className = 'product-title';
@@ -85,8 +94,8 @@
         const productImage = document.createElement('img');
         productImage.src = details.image;
         productImage.alt = details.title;
-        productImage.style.maxWidth = '100%';
-        productImage.style.height = 'auto';
+        productImage.style.width = '85%'; // Set a fixed width
+        productImage.style.height = '85%'; // Set a fixed height
 
         productItem.appendChild(productTitle);
         productItem.appendChild(productPrice);

@@ -23,11 +23,13 @@ def fetch_product_details(link):
     product_title = soup.find('span', {'class': 'B_NuCI'}).text
     product_price = soup.find('div', {'class': '_30jeq3 _16Jk6d'}).text
     product_image = soup.find('img', {'class': '_2r_T1I _396QI4'})['src']
+    
 
     return {
         'title': product_title,
         'price': product_price,
         'image': product_image,
+        'link' : link,
     }
 
 # Configure application
