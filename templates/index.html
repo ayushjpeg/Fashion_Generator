@@ -10,7 +10,7 @@
         <div style="background-color: #f7f7f7; padding: 20px; border-radius: 10px;">
             <h2 style="margin-bottom: 10px;">Recent Entries</h2>
             {% for entry in entries %}
-                <div style="border-bottom: 1px solid #ccc; padding-bottom: 10px; margin-bottom: 10px; white-space: nowrap;direction: ltr">
+                <div style="border-bottom: 1px solid #ccc; padding-bottom: 10px; margin-bottom: 10px; white-space: nowrap; direction: ltr">
                     {{ entry }}
                 </div>
             {% endfor %}
@@ -24,9 +24,6 @@
                       </form>
                 </div>
             </fieldset>
-            <!-- <div class="form-group">
-                <button class="btn btn-default" style="font-size: 200%;" type="submit">Submit</button>
-            </div> -->
         </form>
     </div>
     <div style="flex: 2;">
@@ -34,14 +31,33 @@
             
         </h1>
         
+        <div style="max-height: 70vh; overflow-y: auto;">
+            <h1>Top Flipkart Products</h1>
+            <div id="products-container" style="display: flex; flex-wrap: wrap;"></div>
+        </div>
     </div>
 </div>
 
-<h1>Top Flipkart Products</h1>
-<div id="products-container"></div>
+<style>
+    .product-item {
+        flex-basis: 33.33%;
+        padding: 10px;
+        box-sizing: border-box;
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
 
+    .product-item:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .product-title {
+        margin-top: 10px; /* Adjust this value as needed */
+    }
+</style>
 <script>
     const productsContainer = document.getElementById('products-container');
+
     const productDetails = [
         {% for details in product_details %}
             {
@@ -57,6 +73,7 @@
         productItem.className = 'product-item';
 
         const productTitle = document.createElement('h2');
+        productTitle.className = 'product-title';
         productTitle.textContent = details.title;
 
         const productPrice = document.createElement('p');
@@ -65,6 +82,8 @@
         const productImage = document.createElement('img');
         productImage.src = details.image;
         productImage.alt = details.title;
+        productImage.style.maxWidth = '100%';
+        productImage.style.height = 'auto';
 
         productItem.appendChild(productTitle);
         productItem.appendChild(productPrice);
@@ -72,4 +91,5 @@
         productsContainer.appendChild(productItem);
     });
 </script>
+
 {% endblock %}
