@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css?family=Catamaran&display=swap');
 
 :root {
-    --primary-color: #333;
+    --primary-color:#000000;
     --secondary-color: #444;
     --overlay-color: rgba(0, 0, 0, 0.7);
 }
@@ -48,7 +48,7 @@ a {
     top: 0;
     width: 100%;
     z-index: 990;
-    background-color: white;
+    background-color: #ffffff;
 }
 
 .navbar h1 {
