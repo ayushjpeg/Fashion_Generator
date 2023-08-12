@@ -39,31 +39,31 @@
 </div>
 
 <style>
-
-
     .product-item {
         text-decoration: none;
         color: inherit; /* Inherit the parent element's color */
         cursor: pointer; 
         flex-basis: 33.33%;
-        padding: 10px;
+        padding: 15px 10px; /* Increased padding in height, while keeping 10px horizontal padding */
         box-sizing: border-box;
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, padding 0.2s ease-in-out;
     }
 
     .product-item:hover {
-        text-decoration: underline;
-        transform: scale(1.1);
+        text-decoration: none; /* Remove underline on hover */
+        transform: scale(1.05); /* Slightly reduce scaling */
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-        padding: 50px; /* Adjust this value as needed */
+        padding: 0px 0px; /* Adjust padding for hover effect */
     }
 
     .product-title {
         margin-top: 10px;
-        padding-bottom: 10px;
-        font-size: 18px; /* Adjust this value as needed */
+        margin-bottom: 5px; /* Reduced margin for more space */
+        font-size: 18px;
+        transition: margin 0.2s ease-in-out, padding 0.2s ease-in-out; /* Add transition for margin and padding changes */
     }
 </style>
+
 <script>
     const productsContainer = document.getElementById('products-container');
 
@@ -95,7 +95,7 @@
         productImage.src = details.image;
         productImage.alt = details.title;
         productImage.style.width = '85%'; // Set a fixed width
-        productImage.style.height = '85%'; // Set a fixed height
+        productImage.style.height = '65%'; // Set a fixed height
 
         productItem.appendChild(productTitle);
         productItem.appendChild(productPrice);
