@@ -150,7 +150,6 @@ def login():
         
         rows = db.fetchall()
         
-        print(rows)
         
         if len(rows) != 1 or not check_password_hash(rows[0][2], request.form.get("password")):
             return apology("invalid username and/or password", 403)
@@ -167,7 +166,7 @@ def login():
 @app.route("/logout")
 def logout():
     session.clear()
-    return redirect("/")
+    return redirect("/index")
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -212,7 +211,7 @@ def register():
         
         conn.close()
         
-        return redirect('/')
+        return redirect('/index')
     else:
         return render_template("register.html")
 

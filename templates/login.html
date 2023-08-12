@@ -1,17 +1,66 @@
-{% extends "layout.html" %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/static/style_login.css"
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="form">
+      <form class="form-horizontal signin" method="post" action="/login">
+        <div class="form-wrap" style="position: relative">
+          <h2>Login</h2>
+          <div class="form-group">
+            <!-- <label for="email">Username:</label> -->
+            <div class="relative">
+              <input
+                class="form-control"
+                id="name"
+                type="text"
+                
+                name="username"
+                id="username"
+                autofocus
+                
+                
+                placeholder="Username"
+              />
+              <i class="fa fa-user"></i>
+            </div>
+          </div>
 
-{% block title %}
-    Log In
-{% endblock %}
+          <div class="form-group">
+            <!-- <label for="email">Password:</label> -->
+            <div class="relative">
+              <input
+                class="form-control"
+                type="password"
+                name ="password"
+                id="password"
+                
+                placeholder="Password"
+              />
+              <i class="fa fa-key"></i>
+            </div>
+    
+          </div>
 
-{% block main %}
-    <form action="/login" method="post">
-        <div class="mb-3">
-            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="username" name="username" placeholder="Username" type="text">
+          <div class="login-btn">
+            <a 
+              ><button class="movebtn movebtnsu" type="Submit" >
+                Login <i class="fa fa-fw fa-lock"></i></button
+            ></a>
+
+ 
         </div>
-        <div class="mb-3">
-            <input class="form-control mx-auto w-auto" id="password" name="password" placeholder="Password" type="password">
+        <div class="sign-up">
+          <a href="register" class="signbtn"
+            ><small>Not a member? Sign Up <i>(Click me)</i></small></a
+          >
         </div>
-        <button class="btn btn-primary" type="submit">Log In</button>
-    </form>
-{% endblock %}
+      </form>
+    </div>
+  </body>
+</html>
