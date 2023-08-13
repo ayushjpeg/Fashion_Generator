@@ -48,6 +48,21 @@ a:hover{
     margin-bottom: 20px;
     text-align: center;
 }
+
+.navbar .logo {
+    display: flex;
+    align-items: center;
+}
+
+.navbar .logo a {
+    display: block;
+}
+
+.navbar .logo img {
+    width: 100px; /* Adjust the width as needed */
+    height: auto;
+}
+
 label{
     text-transform: uppercase;
     font-weight: 700;

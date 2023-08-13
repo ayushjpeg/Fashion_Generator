@@ -304,6 +304,22 @@ a {
 .section-footer a > i:hover {
     color: var(--secondary-color);
 }
+.logo-bottom-right {
+    position: fixed;
+    top: 20px; /* Adjust the distance from the bottom */
+    left: 20px; /* Adjust the distance from the right */
+    z-index: 999; /* Ensure the logo appears above other content */
+}
+
+.logo-bottom-right a {
+    display: block;
+}
+
+.logo-bottom-right img {
+    width: 170px; /* Adjust the width as needed */
+    height: auto;
+}
+
 
 
 /* Email Form */
