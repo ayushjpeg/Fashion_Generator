@@ -120,6 +120,7 @@ def index():
 def login():
     global final_preferences
     
+    print(final_preferences)
     session.clear()
 
     if request.method == "POST":
@@ -159,7 +160,7 @@ def login():
         for history_row in history_data:
             color, items, brands, size = history_row[2:6]
             final_preferences['color'] = color
-            final_preferences['item'].extend(items.split(','))
+            final_preferences['items'].extend(items.split(','))
             final_preferences['brands'].extend(brands.split(','))
             final_preferences['size'] = size
 
@@ -167,7 +168,7 @@ def login():
             color, dont_recommend, items = likings_row[2:5]
             final_preferences['color'] = color
             final_preferences['dont_recommend'].extend(dont_recommend.split(','))
-            final_preferences['item'].extend(items.split(','))
+            final_preferences['items'].extend(items.split(','))
             
         conn.close()
         
@@ -181,6 +182,7 @@ def logout():
     
     global final_preferences
     
+    # Connect to the database
     conn = sqlite3.connect('fashion_database.db')
     cursor = conn.cursor()
 
@@ -196,7 +198,7 @@ def logout():
     size = history_entry.get('size', '')
     brands = ','.join(history_entry.get('brands', []))
     cursor.execute('''
-        INSERT INTO History (user_id, style, color, items, size, brands)
+        INSERT OR REPLACE INTO History (user_id, style, color, items, size, brands)
         VALUES (?, ?, ?, ?, ?, ?)
     ''', (user_id, style, color, items, size, brands))
 
@@ -208,7 +210,7 @@ def logout():
     dont_recommend = ','.join(likings_entry.get('dont_recommend', []))
     items = ','.join(likings_entry.get('items', []))
     cursor.execute('''
-        INSERT INTO Likings (user_id, color, location, dont_recommend, items)
+        INSERT OR REPLACE INTO Likings (user_id, color, location, dont_recommend, items)
         VALUES (?, ?, ?, ?, ?)
     ''', (user_id, color, location, dont_recommend, items))
 
@@ -265,5 +267,35 @@ def register():
         return render_template("register.html")
 
 
+@app.route('/history', methods=["GET", "POST"])
+def history():
+    if request.method == "POST":
+        
+        conn = sqlite3.connect('fashion_database.db')
+        cursor = conn.cursor()
+        
+        user_id = session["user_id"]
+
+        style = request.form.get('style')
+        color = request.form.get('color')
+        items = request.form.get('items').split(',')
+        size = request.form.get('size')
+        brands = request.form.get('brands').split(',')
+
+        items_str = ','.join(items)
+        brands_str = ','.join(brands)
+        print(color,items,size,brands)
+        cursor.execute('''
+            INSERT OR REPLACE INTO History (user_id, style, color, items, size, brands)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (user_id, style, color, items_str, size, brands_str))
+
+        conn.commit()
+
+        return redirect('/index')
+    else:
+        return render_template('history.html')
+
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0',port = 8080, debug=True)
+    app.run(host='0.0.0.0',port = 5000, debug=True)
