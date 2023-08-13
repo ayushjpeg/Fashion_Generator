@@ -4,23 +4,16 @@ html{
     height: 100%;
 }
 body {
-    background: #151515;  /* fallback for old browsers */
+    background: rgb(0, 0, 0);  /* fallback for old browsers */
     margin: 0;
     font-family: 'Open Sans', sans-serif;
     background-color: #f8f8f8;
     background-size: 20px 20px;
     font-size: 14px;
-    background: rgba(63,60,79,1);
-    background: -moz-linear-gradient(top, rgba(63,60,79,1) 0%, rgba(60,59,77,1) 100%);
-    background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(63,60,79,1)), color-stop(100%, rgba(60,59,77,1)));
-    background: -webkit-linear-gradient(top, rgba(63,60,79,1) 0%, rgba(60,59,77,1) 100%);
-    background: -o-linear-gradient(top, rgba(63,60,79,1) 0%, rgba(60,59,77,1) 100%);
-    background: -ms-linear-gradient(top, rgba(63,60,79,1) 0%, rgba(60,59,77,1) 100%);
-    background: linear-gradient(to bottom, rgba(63,60,79,1) 0%, rgba(60,59,77,1) 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3f3c4f', endColorstr='#3c3b4d', GradientType=0 );
+    background: rgb(0, 0, 0);
 }
 a{
-    color: #3c3b4d;
+    color: #000000;
 }
 a:hover{
     text-decoration: none;
@@ -67,6 +60,7 @@ label{
 input {
     width: 60%;
     padding: 10px;
+    margin-left: 75px;
     box-sizing: border-box;
     background: none;
     outline: none;
@@ -87,6 +81,7 @@ input {
 button {
     padding: 8px 12px;
     margin: 4px 0;
+    margin-left: 150px;
     font-family: 'Montserrat', sans-serif;
     border: 2px solid #78788c;
     background: 0;
@@ -95,10 +90,10 @@ button {
     transition: all .3s;
 }
 button:hover {
-    background: #646171;
+    background: #242424;
     color: #fff;
-    border-color: #646171;
-    box-shadow: 0px 0 5px 0 #646171;
+    border-color: #000000;
+    box-shadow: 0px 0 5px 0 #000000;
 }
 .login-btn{margin-top: 50px;}
 
@@ -116,7 +111,7 @@ button:hover {
     transition: all 0.15s ease-in-out;
 }
 input:focus + .fa{
-    color: #3e3b4e;
+    color: #000000;
     transform: rotate(360deg);
 }
 .form-group{
@@ -156,56 +151,3 @@ hr{
     border-top: 1px solid rgba(0, 0, 0, 0.4);
 }
 /* --- Animated Buttons --- */
-.movebtn{
-    background-color: transparent;
-    display:inline-block;
-    width:100%;
-    background-image: none;
-    padding: 8px 10px;
-    border-radius: 0;
-    -webkit-transition: all 0.5s;
-    -moz-transition: all 0.5s;
-    transition: all 0.5s;
-    -webkit-transition-timing-function: cubic-bezier(0.5, 1.65, 0.37, 0.66);
-    transition-timing-function: cubic-bezier(0.5, 1.65, 0.37, 0.66);
-}
-.movebtnre {
-    border: 2px solid #ff5501;
-    box-shadow: inset 0 0 0 0 #ff5501;
-    color:#ff5501;
-}
-.movebtnsu {
-    border: 2px solid #3e3b4e;
-    color: #ffffff;
-    background-color: #3e3b4e;
-}
-.google, .facebook{
-    width: 50%;
-    float: left;
-}
-.google {
-    border: 2px solid #e04c40;
-    color: #ffffff;
-    background-color: #e04c40;
-}
-.facebook {
-    border: 2px solid #2e4da7;
-    color: #ffffff;
-    background-color: #2e4da7;
-}
-.google:focus,
-.google:hover,
-.google:active {
-    background-color: #ea3728;
-    color: #FFF;
-    border-color: #ea3728;
-    box-shadow: none;
-}
-.facebook:focus,
-.facebook:hover,
-.facebook:active {
-    background-color: #1e439b;
-    color: #FFF;
-    border-color: #1e439b;
-    box-shadow: none;
-}

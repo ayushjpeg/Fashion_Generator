@@ -2,7 +2,7 @@
 
 :root {
     --primary-color:#000000;
-    --secondary-color: #444;
+    --secondary-color: rgb(68, 68, 68);
     --overlay-color: rgba(0, 0, 0, 0.7);
 }
 
@@ -48,11 +48,11 @@ a {
     top: 0;
     width: 100%;
     z-index: 990;
-    background-color: #ffffff;
+    background-color: #000000;
 }
 
 .navbar h1 {
-    color: var(--primary-color);
+    color: white;
 }
 
 .navbar .container {
