@@ -320,6 +320,17 @@ a {
     height: auto;
 }
 
+.footer-image {
+    text-align: right;
+    margin-top: 20px;
+    margin-right: 40px; /* Increase this value to move the image further right */
+}
+
+.footer-image img {
+    max-width: 100%;
+    height: auto;
+}
+
 
 
 /* Email Form */
