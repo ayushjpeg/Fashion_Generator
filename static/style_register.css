@@ -11,7 +11,7 @@ body {
     background-position: center;
     height: 100vh;
     font-family: 'Open Sans', sans-serif;
-    font-size: 10px;
+    font-size: 18px;
 }
 
 a{
@@ -22,7 +22,7 @@ a:hover{
 }
 .form {
     max-width: calc(100vw - 40px);
-    width: 420px;
+    width: 500px;
     height: auto;
     background: rgb(119, 118, 118);
     padding: 30px;
@@ -55,3 +55,101 @@ a:hover{
     margin-bottom: 40px;
     text-align: center;
 }
+label{
+    text-transform: uppercase;
+    font-weight: 700;
+}
+input {
+    width: 60%;
+    padding: 10px;
+    margin-left: 75px;
+    box-sizing: border-box;
+    background: none;
+    outline: none;
+    resize: none;
+    border: 0;
+    font-family: 'Montserrat', sans-serif;
+    border: 2px solid #bebed2;
+}
+.form p:before {
+    content: attr(type);
+    display: block;
+    margin: 10px 0 0;
+    font-size: 13px;
+    color: #5a5a5a;
+    float: left;
+    width: 40%;
+}
+button {
+    padding: 8px 12px;
+    margin: 4px 0;
+    margin-left: 150px;
+    font-family: 'Montserrat', sans-serif;
+    border: 2px solid #78788c;
+    background: 0;
+    color: #5a5a6e;
+    cursor: pointer;
+    transition: all .3s;
+}
+button:hover {
+    background: #242424;
+    color: #fff;
+    border-color: #000000;
+    box-shadow: 0px 0 5px 0 #000000;
+}
+.login-btn{margin-top: 50px;}
+
+.relative{
+    position: relative;
+}
+.relative i.fa{
+    position: absolute;
+    top: 10px;
+    left: 0;
+    width: 30px;
+    color: #9b9aa3;
+    text-align: center;
+    border-radius: 0 4px 4px 0;
+    transition: all 0.15s ease-in-out;
+}
+input:focus + .fa{
+    color: #000000;
+    transform: rotate(360deg);
+}
+.form-group{
+    margin-bottom: 20px;
+}
+.form-control{
+    font-size: 14px;
+    padding-left: 40px;
+    border: none;
+    border-bottom: 1px solid #3c3b4d;
+    border-radius: 0;
+    background-color: transparent;
+}
+.form-control:focus{
+    border-color: #1e439b;
+    box-shadow: inset 0 0px 0px rgba(0,0,0,.075), 0 3px 4px -3px rgb(30, 102, 195);
+    background-color: transparent;
+}
+.sign-up{
+    margin-top: 30px;
+    text-align: center;
+    position: relative;
+    margin-bottom: -15px;
+}
+.login-text{
+    position: absolute;
+    top: -11px;
+    text-align: center;
+    width: 30%;
+    background-color: #fff;
+    left: 50%;
+    transform: translateX(-50%);
+}
+hr{
+    margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.4);
+}
+/* --- Animated Buttons --- */

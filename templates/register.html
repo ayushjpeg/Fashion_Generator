@@ -15,35 +15,73 @@
     <form  method="post">
         <fieldset>
             <h2>Register</h2>
-            <div class="form-group">
-                <input autocomplete="off" autofocus class="form-control" name="name" placeholder="Name" type="text"/>
-                <i class="fa fa-user"></i>
-            </div>
-            <div class="form-group">
-                <input autocomplete="off" autofocus class="form-control" name="username" placeholder="Username" type="text"/>
-                <i class="fa fa-user"></i>
-            </div>
-            <form action="process_gender.php" method="post">
-                <label for="gender">Select your gender:</label>
-                <select id="gender" name="gender">
-                    <option value="none">Select</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                </select>
-            </form>
-            <div class="form-group">
-                <input autocomplete="off" autofocus class="form-control" name="age" placeholder="Age" type="number"/>
-            </div>
-            <div class="form-group">
-                <input class="form-control" name="password" placeholder="Password" type="password"/>
-            </div>
-            <div class="form-group">
-                <input class="form-control" name="confirmation" placeholder="Password Confirmation" type="password"/>
-            </div>
-            <div class="form-group">
-                <button class="btn btn-default" type="submit">Register</button>
-            </div>
+            <div class="form">
+                <form class="form-horizontal signin" method="post" action="/login">
+                  <div class="form-wrap" style="position: relative">
+                    
+                    <h2>Login for Personalized Recommendations</h2>
+                    <div class="form-group">
+                        <div class="form-group">
+                            <input autocomplete="off" autofocus class="form-control" name="name" placeholder="Name" type="text"/>
+                            <i class="fa fa-user"></i>
+                        </div>
+                        
+                      <!-- <label for="email">Username:</label> -->
+                      <div class="relative">
+                        <input
+                          class="form-control"
+                          type="text"
+                          name="username"
+                          id="username"
+                          autofocus
+                          placeholder="Username"
+                        />
+                        <i class="fa fa-user"></i>
+                      </div>
+                    </div>
+          
+                    <div class="form-group">
+                      <!-- <label for="email">Password:</label> -->
+                      <div class="relative">
+                        <input
+                          class="form-control"
+                          type="password"
+                          name ="password"
+                          id="password"
+                          
+                          placeholder="Password"
+                        />
+                        <div class="form-group">
+                            <input class="form-control" name="confirmation" placeholder="Password Confirmation" type="password"/>
+                        </div>
+                        <i class="fa fa-key"></i>
+                      </div>
+              
+                    </div>
+                    
+                    <div class="form-group">
+                        <input autocomplete="off" autofocus class="form-control" name="age" placeholder="Age" type="number"/>
+                    </div>
+                    <form action="process_gender.php" method="post">
+                        <label for="gender">Select your gender:</label>
+                        <select id="gender" name="gender">
+                            <option value="none">Select</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </form>
+                    <div class="login-btn">
+                      <a >
+                        <button class="movebtn movebtnsu" type="Submit" >
+                          Register <i class="fa fa-fw fa-lock"></i></button>
+                      </a>
+                  </div>
+                </form>
+              </div>
+        
+            
+            
         </fieldset>
     </form>
 {% endblock %}
