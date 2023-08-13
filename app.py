@@ -120,7 +120,7 @@ def login():
     if request.method == "POST":
         
         # Database
-        conn = sqlite3.connect("userdata.db")
+        conn = sqlite3.connect("fashion_database.db")
         db = conn.cursor()
         
         
@@ -130,7 +130,7 @@ def login():
             return apology("must provide password", 403)
         username_to_search = request.form.get("username")
         
-        db.execute("SELECT * FROM users WHERE username = ?", (username_to_search,))
+        db.execute("SELECT * FROM User WHERE username = ?", (username_to_search,))
         
         rows = db.fetchall()
         
@@ -160,39 +160,38 @@ def register():
         
         
         # Database
-        conn = sqlite3.connect("userdata.db")
+        conn = sqlite3.connect("fashion_database.db")
         db = conn.cursor()
 
-        if (not request.form.get("username")) or request.form.get("username") == "" or request.form.get("username") == None:
-            return apology("Username cannot be left blank")
+        if not request.form.get("username") or not request.form.get("password") or not request.form.get("confirmation"):
+            return apology("All fields must be filled")
 
-        if (not request.form.get("password")) or request.form.get("password") == "" or request.form.get("password") == None:
-            return apology("Password cannot be left blank")
-
-        if (not request.form.get("confirmation")) or request.form.get("confirmation") == None:
-            return apology("Password confirmation cannot be left blank")
-        
         if request.form.get("password") != request.form.get("confirmation"):
-            return apology("Password and confirm password dont match")
+            return apology("Password and confirm password don't match")
 
-        username_to_search = request.form.get("username")
-        db.execute("SELECT * FROM users WHERE username = ?", (username_to_search,))
-        
+        username = request.form.get("username")
+        name = request.form.get("name")
+        gender = request.form.get("gender")
+        age = request.form.get("age")
+        hashed_password = generate_password_hash(request.form.get("password"))
+
+        # Check if username already exists
+        db.execute("SELECT * FROM User WHERE username = ?", (username,))
         rows = db.fetchall()
-
         if len(rows) > 0:
             return apology("Username already exists")
-        
-        username = request.form.get("username")
-        hashed_password = generate_password_hash(request.form.get("password"))
-        db.execute("INSERT INTO users (username, hash) VALUES (?, ?)", (username, hashed_password))
+
+        # Insert user data into User table
+        db.execute("INSERT INTO User (username, password, name, gender, age) VALUES (?, ?, ?, ?, ?)",
+                (username, hashed_password, name, gender, age))
         conn.commit()
 
-        db.execute("SELECT id FROM users WHERE username = ?", (username,))
+        # Fetch the user_id of the newly inserted user
+        db.execute("SELECT id FROM User WHERE username = ?", (username,))
         user_id = db.fetchone()[0]
 
         session["user_id"] = user_id
-        
+
         conn.close()
         
         return redirect('/index')
