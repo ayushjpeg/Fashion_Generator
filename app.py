@@ -1,36 +1,11 @@
 from flask import Flask, redirect, render_template, request, session
 import nltk
 from nltk.chat.util import Chat, reflections
-import requests
 from flask_session import Session
-from bs4 import BeautifulSoup
 from werkzeug.security import check_password_hash, generate_password_hash
-from helpers import apology, login_required
+from helpers import apology, login_required, fetch_product_details, search_flipkart, set_user_preferences
 from support import Fashion_array
 import sqlite3
-
-def search_flipkart(query):
-    url = f'https://www.flipkart.com/search?q={query}&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off'
-    response = requests.get(url)
-    soup = BeautifulSoup(response.content, 'html.parser')
-    return soup
-
-def fetch_product_details(link):
-    response = requests.get(link)
-    soup = BeautifulSoup(response.content, 'html.parser')
-
-    # Extract product details (customize based on the actual structure)
-    product_title = soup.find('span', {'class': 'B_NuCI'}).text
-    product_price = soup.find('div', {'class': '_30jeq3 _16Jk6d'}).text
-    product_image = soup.find('img', {'class': '_2r_T1I _396QI4'})['src']
-    
-
-    return {
-        'title': product_title,
-        'price': product_price,
-        'image': product_image,
-        'link' : link,
-    }
 
 # Configure application
 app = Flask(__name__, static_folder='static', template_folder='templates')
@@ -47,16 +22,26 @@ Session(app)
 id = ''
 
 
-
-
-
 # Variables
 entries = []
 user_preferences = {}
 fashion_patterns = Fashion_array()
+final_preferences = {
+    'color':"",
+    'item':[],
+    'brands':[],
+    'size':"M",
+    'Gender':"",
+    'Price_min':0,
+    'Price_max':10000,
+    'Name':"", 
+}
+
 
 # Chatbot config
 fashion_chatbot = Chat(fashion_patterns, reflections)
+
+
 
 # Ensuring responses are not cached
 @app.after_request
@@ -66,48 +51,45 @@ def after_request(response):
     response.headers["Pragma"] = "no-cache"
     return response
 
+
+
 @app.route('/',methods=["GET","POST"])
 def front():
     return render_template("front.html")
 
+
+
 @app.route('/index',methods=["GET", "POST"])
-def index():
-    global entries  
+def index(): 
+    
+    # Calling variables
+    global entries, user_preferences, final_preferences, fashion_patterns
+    
+    
     if request.method == "POST":
+        
+        
+        # Taking user input 
         s = request.form.get("Entry")
         entries.append("USER : "+s)
+        
+        
+        # Generating bot's response
         response_of_bot = fashion_chatbot.respond(str(s))
         entries.append("BOT : "+response_of_bot)
-        try:
-            for pattern, _ in fashion_patterns:
-                match = nltk.re.search(pattern, str(s))
-                if match:
-                    preference = match.group(1)
-                    if preference:
-                        if 'wear'  in pattern:
-                            category = 'clothing'
-                        elif 'color' in pattern:
-                            category = 'colors'
-                        elif 'material' in pattern:
-                            category = 'materials'
-                        elif 'style' in pattern:
-                            category = 'styles'
-                        elif 'brand' in pattern:
-                            category = 'brands'
-                        else:
-                            category = 'other'  
-                        user_preferences[category] = (preference)  
-                        
-                        entries.append(f"I'll remember that you enjoy {preference} in {category}.")
-                    break
-        except:
-            entries.append("I was expecting something more detailed about your likings.")
         
-        search_criteria = user_preferences
-        print(search_criteria)
-        search_query = ' '.join(search_criteria.values())
+        
+        # Updating user_preferences as per the conversation
+        entries, user_preferences = set_user_preferences(entries,user_preferences,fashion_patterns,str(s))
+        print(user_preferences)
+        
+        
+        # Generating flipkart buy link as per the preference
+        search_query = ' '.join(user_preferences["clothing"])
         search_results = search_flipkart(search_query)
 
+
+        # Extracting information from flipkart link to display on webpage
         top_links = []
         products = search_results.find_all('div', {'class': '_1AtVbE'})
         for product in products:
@@ -216,7 +198,6 @@ def register():
         return redirect('/index')
     else:
         return render_template("register.html")
-
 
 
 if __name__ == '__main__':
