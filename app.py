@@ -28,13 +28,16 @@ user_preferences = {}
 fashion_patterns = Fashion_array()
 final_preferences = {
     'color':"",
-    'item':[],
+    'items':[],
     'brands':[],
     'size':"M",
     'Gender':"",
     'Price_min':0,
     'Price_max':10000,
     'Name':"", 
+    'dont_recommend':[],
+    'location':"",
+    'style':"",
 }
 
 
@@ -115,6 +118,8 @@ def index():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    global final_preferences
+    
     session.clear()
 
     if request.method == "POST":
@@ -140,6 +145,30 @@ def login():
 
         session["user_id"] = rows[0][0]
         
+        # Extracting previous data 
+        
+        # Query History table
+        db.execute('SELECT * FROM History')
+        history_data = db.fetchall()
+
+        # Query Likings table
+        db.execute('SELECT * FROM Likings')
+        likings_data = db.fetchall()
+        
+        # Updating using user data 
+        for history_row in history_data:
+            color, items, brands, size = history_row[2:6]
+            final_preferences['color'] = color
+            final_preferences['item'].extend(items.split(','))
+            final_preferences['brands'].extend(brands.split(','))
+            final_preferences['size'] = size
+
+        for likings_row in likings_data:
+            color, dont_recommend, items = likings_row[2:5]
+            final_preferences['color'] = color
+            final_preferences['dont_recommend'].extend(dont_recommend.split(','))
+            final_preferences['item'].extend(items.split(','))
+            
         conn.close()
         
         return redirect("/index")
@@ -149,6 +178,43 @@ def login():
  
 @app.route("/logout")
 def logout():
+    
+    global final_preferences
+    
+    conn = sqlite3.connect('fashion_database.db')
+    cursor = conn.cursor()
+
+    # Retrieve user_id from session
+    user_id = session['user_id']
+
+    # Update History table
+    history_keys = ['style', 'color', 'items', 'size', 'brands']
+    history_entry = {key: final_preferences.get(key, '') for key in history_keys}
+    style = history_entry.get('style', '')
+    color = history_entry.get('color', '')
+    items = ','.join(history_entry.get('items', []))
+    size = history_entry.get('size', '')
+    brands = ','.join(history_entry.get('brands', []))
+    cursor.execute('''
+        INSERT INTO History (user_id, style, color, items, size, brands)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', (user_id, style, color, items, size, brands))
+
+    # Update Likings table
+    likings_keys = ['color', 'location', 'dont_recommend', 'items']
+    likings_entry = {key: final_preferences.get(key, '') for key in likings_keys}
+    color = likings_entry.get('color', '')
+    location = likings_entry.get('location', '')
+    dont_recommend = ','.join(likings_entry.get('dont_recommend', []))
+    items = ','.join(likings_entry.get('items', []))
+    cursor.execute('''
+        INSERT INTO Likings (user_id, color, location, dont_recommend, items)
+        VALUES (?, ?, ?, ?, ?)
+    ''', (user_id, color, location, dont_recommend, items))
+
+    # Commit changes and close the connection
+    conn.commit()
+    conn.close()
     session.clear()
     return redirect("/index")
 
