@@ -68,6 +68,8 @@ def index():
     # Calling variables
     global entries, user_preferences, final_preferences, fashion_patterns
     
+    print(final_preferences)
+    
     
     if request.method == "POST":
         
@@ -120,7 +122,7 @@ def index():
 def login():
     global final_preferences
     
-    print(final_preferences)
+    
     session.clear()
 
     if request.method == "POST":
@@ -151,24 +153,27 @@ def login():
         # Query History table
         db.execute('SELECT * FROM History')
         history_data = db.fetchall()
-
+        print(history_data)
+        
         # Query Likings table
         db.execute('SELECT * FROM Likings')
         likings_data = db.fetchall()
         
+        
         # Updating using user data 
         for history_row in history_data:
-            color, items, brands, size = history_row[2:6]
+            color, items, size, brands = history_row[2:6]
+            print(color,items,size,brands)
             final_preferences['color'] = color
             final_preferences['items'].extend(items.split(','))
             final_preferences['brands'].extend(brands.split(','))
             final_preferences['size'] = size
 
-        for likings_row in likings_data:
-            color, dont_recommend, items = likings_row[2:5]
-            final_preferences['color'] = color
-            final_preferences['dont_recommend'].extend(dont_recommend.split(','))
-            final_preferences['items'].extend(items.split(','))
+        # for likings_row in likings_data:
+        #     color, dont_recommend, items = likings_row[2:5]
+        #     final_preferences['color'] = color
+        #     final_preferences['dont_recommend'].extend(dont_recommend.split(','))
+        #     final_preferences['items'].extend(items.split(','))
             
         conn.close()
         
@@ -189,18 +194,18 @@ def logout():
     # Retrieve user_id from session
     user_id = session['user_id']
 
-    # Update History table
-    history_keys = ['style', 'color', 'items', 'size', 'brands']
-    history_entry = {key: final_preferences.get(key, '') for key in history_keys}
-    style = history_entry.get('style', '')
-    color = history_entry.get('color', '')
-    items = ','.join(history_entry.get('items', []))
-    size = history_entry.get('size', '')
-    brands = ','.join(history_entry.get('brands', []))
-    cursor.execute('''
-        INSERT OR REPLACE INTO History (user_id, style, color, items, size, brands)
-        VALUES (?, ?, ?, ?, ?, ?)
-    ''', (user_id, style, color, items, size, brands))
+    # # Update History table
+    # history_keys = ['style', 'color', 'items', 'size', 'brands']
+    # history_entry = {key: final_preferences.get(key, '') for key in history_keys}
+    # style = history_entry.get('style', '')
+    # color = history_entry.get('color', '')
+    # items = ','.join(history_entry.get('items', []))
+    # size = history_entry.get('size', '')
+    # brands = ','.join(history_entry.get('brands', []))
+    # cursor.execute('''
+    #     INSERT OR REPLACE INTO History (user_id, style, color, items, size, brands)
+    #     VALUES (?, ?, ?, ?, ?, ?)
+    # ''', (user_id, style, color, items, size, brands))
 
     # Update Likings table
     likings_keys = ['color', 'location', 'dont_recommend', 'items']
@@ -259,7 +264,7 @@ def register():
         user_id = db.fetchone()[0]
 
         session["user_id"] = user_id
-
+        conn.commit()
         conn.close()
         
         return redirect('/index')
@@ -289,8 +294,13 @@ def history():
             INSERT OR REPLACE INTO History (user_id, style, color, items, size, brands)
             VALUES (?, ?, ?, ?, ?, ?)
         ''', (user_id, style, color, items_str, size, brands_str))
-
+        
+        # Print inserted data for testing
+        cursor.execute("SELECT * FROM History WHERE user_id = ?", (user_id,))
+        inserted_data = cursor.fetchone()
+        print("Inserted Data:", inserted_data)
         conn.commit()
+        conn.close()
 
         return redirect('/index')
     else:
