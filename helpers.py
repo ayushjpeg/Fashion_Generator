@@ -56,12 +56,6 @@ def set_user_preferences(entries,user_preferences,fashion_patterns,s):
                             category = 'clothing'
                         elif 'color' in pattern:
                             category = 'colors'
-                        elif 'material' in pattern:
-                            category = 'materials'
-                        elif 'style' in pattern:
-                            category = 'styles'
-                        elif 'brand' in pattern:
-                            category = 'brands'
                         else:
                             category = 'other'  
                         user_preferences[category] = (preference)  

@@ -24,7 +24,11 @@ id = ''
 
 # Variables
 entries = []
-user_preferences = {}
+user_preferences = {
+    "clothing":[],
+    "color":"",
+    "other":[],
+}
 fashion_patterns = Fashion_array()
 final_preferences = {
     'color':"",
@@ -90,7 +94,7 @@ def index():
         
         
         # Generating flipkart buy link as per the preference
-        search_query = ' '.join(user_preferences["clothing"])
+        search_query = ''.join(user_preferences["clothing"])
         search_results = search_flipkart(search_query)
 
 
