@@ -1,5 +1,5 @@
-
-
+import nltk
+nltk.download('stopwords')
 def Fashion_array():
     arr = [(r'hi|hello', ['Hello!', 'Hi there!', 'Hey!']),
         (r'bye|goodbye', ['Goodbye!', 'See you later!', 'Bye!']),

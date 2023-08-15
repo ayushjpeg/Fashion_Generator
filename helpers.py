@@ -27,7 +27,6 @@ def login_required(f):
 
 
 def fetch_product_details(link):
-    print(link)
     response = requests.get(link)
     soup = BeautifulSoup(response.content, 'html.parser')
 
