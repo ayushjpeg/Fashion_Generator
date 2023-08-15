@@ -487,7 +487,30 @@ def special_occasion():
                             continue
                 occasion_details += current_details
                 product_details += current_details
+@app.route('/occassion', methods=["GET", "POST"])
+def occassion():
+    global occasion_details, product_details
+    if request.method == "POST":
+        return redirect('/index')
+    else:
+        return render_template('occassion.html',occasion_details=occasion_details,product_details=product_details)
 
+@app.route('/trends', methods=["GET", "POST"])
+def trends():
+    global trends_details, product_details
+    if request.method == "POST":
+        return redirect('/index')
+    else:
+        return render_template('trends.html',trends_details=trends_details,product_details=product_details)
+
+@app.route('/liking', methods=["GET", "POST"])
+def liking():
+    global liking_details
+    if request.method == "POST":
+        return redirect('/index')
+    else:
+        return render_template('liking.html',liking_details=liking_details)
+        
 
 if __name__ == '__main__':
     #special_occasion()

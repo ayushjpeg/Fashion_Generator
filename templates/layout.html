@@ -18,17 +18,16 @@
                 <div class="logo">
                     <a href="/"><img src="/static/images/logogrid.png" alt="Logo"></a>
                 </div>
-              <a class="navbar-brand" style="margin-left: 20px;" href="#">Fashion Generator</a>
+              <a class="navbar-brand" style="margin-left: 20px;" href="/index">Style Pal</a>
               <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
               </button>
               <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 {% if session["user_id"] %}
                         <ul class="navbar-nav me-auto mt-2">
-                            <li class="nav-item"><a class="nav-link" href="/">Likings</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/">Social Media Trends</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/">Upcoming Festives</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/">Based on history</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/liking">Likings</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/trends">Social Media Trends</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/occassion">Upcoming Festives</a></li>
                         </ul>
                         <ul class="navbar-nav ms-auto mt-2">
                             <li class="nav-item"><a class="nav-link" href="/logout">Log Out</a></li>
@@ -44,7 +43,7 @@
             </div>
           </nav>
 
-        <title>Fashion- Generator {% block title %}{% endblock %}</title>
+        <title>Style Pal {% block title %}{% endblock %}</title>
 
         
     </head>
