@@ -3,9 +3,13 @@ import nltk
 from nltk.chat.util import Chat, reflections
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
-from helpers import apology, login_required, fetch_product_details, search_flipkart, set_user_preferences
-from support import Fashion_array
 import sqlite3
+import random
+import datetime
+from helpers import apology, login_required, fetch_product_details, search_flipkart, set_user_preferences
+from support import Fashion_array, trend_check
+from Special_occassion import festives
+from Trends_extraction import instagram
 
 # Configure application
 app = Flask(__name__, static_folder='static', template_folder='templates')
@@ -25,29 +29,36 @@ id = ''
 # Variables
 entries = []
 user_preferences = {
-    "clothing":[],
+    "items":[],
     "color":"",
     "other":[],
+    "brands":[],
+    "dont_recommend":[],
 }
-fashion_patterns = Fashion_array()
+product_details = []
+history_details = []
+trends_details = []
+occasion_details = []
+liking_details = []
+flag = 0
+
+
+
+# nltk replies
+# fashion_patterns = Fashion_array()
+
 final_preferences = {
     'color':"",
-    'items':[],
-    'brands':[],
     'size':"M",
-    'Gender':"",
-    'Price_min':0,
-    'Price_max':10000,
-    'Name':"", 
-    'dont_recommend':[],
+    'gender':"",
+    'name':"",
     'location':"",
-    'style':"",
+    'age':25,
 }
 
 
 # Chatbot config
-fashion_chatbot = Chat(fashion_patterns, reflections)
-
+# fashion_chatbot = Chat(fashion_patterns, reflections)
 
 
 # Ensuring responses are not cached
@@ -62,6 +73,18 @@ def after_request(response):
 
 @app.route('/',methods=["GET","POST"])
 def front():
+    global  final_preferences, product_details, entries
+    session.clear()
+    final_preferences = {
+        'color': "",
+        'size': "M",
+        'gender': "",
+        'name': "",
+        'location': "",
+        'age': 25,
+    }
+    product_details = list()
+    entries = list()
     return render_template("front.html")
 
 
@@ -70,63 +93,92 @@ def front():
 def index(): 
     
     # Calling variables
-    global entries, user_preferences, final_preferences, fashion_patterns
-    
+    global entries,  final_preferences, product_details, history_details, liking_details
+
     print(final_preferences)
     
-    
     if request.method == "POST":
-        
-        
+
         # Taking user input 
         s = request.form.get("Entry")
         entries.append("USER : "+s)
-        
-        
+
         # Generating bot's response
-        response_of_bot = fashion_chatbot.respond(str(s))
-        entries.append("BOT : "+response_of_bot)
+        # response_of_bot = fashion_chatbot.respond(str(s))
+        # entries.append("BOT : "+response_of_bot)
         
         
         # Updating user_preferences as per the conversation
-        entries, user_preferences = set_user_preferences(entries,user_preferences,fashion_patterns,str(s))
-        print(user_preferences)
-        
-        
-        # Generating flipkart buy link as per the preference
-        search_query = ''.join(user_preferences["clothing"])
-        search_results = search_flipkart(search_query)
+        entries, user_preferences = set_user_preferences(entries, {},str(s))
 
+        
+        if "dont_recommend" in user_preferences:
+            temp = []
+            for i in product_details:
+                print(i)
+                if i["color"] and i["color"].lower() == user_preferences["dont_recommend"].lower():
+                    pass
+                elif i["brand"] and i["brand"].lower() == user_preferences["dont_recommend"].lower():
+                    pass
+                elif i["items"] and i["items"].lower() == user_preferences["dont_recommend"].lower():
+                    pass
+                else:
+                    temp.append(i)
+            product_details = list(temp)
+
+        # Generating flipkart buy link as per the preference
+        search_results_list = search_flipkart(user_preferences,final_preferences)
+        # print(search_results_list)
 
         # Extracting information from flipkart link to display on webpage
         top_links = []
-        products = search_results.find_all('div', {'class': '_1AtVbE'})
-        for product in products:
-            link_element = product.find('a', {'class': 'IRpwTa'})
-            if link_element:
-                link = 'https://www.flipkart.com' + link_element['href']
-                top_links.append(link)
-        product_details = []
-        for link in top_links:
-            try:
-                details = fetch_product_details(link)
-                product_details.append(details)
-            except:
-                continue
+        current_details = []
+        for search_results in search_results_list:
+            products = search_results[0].find_all('div', {'class': '_1AtVbE'})
+            for product in products:
+                for j in ['s1Q9rs','IRpwTa']:
+                    link_element = product.find('a', {'class': j})
+                    if link_element:
+                        link = 'https://www.flipkart.com' + link_element['href']
+                        top_links.append(link)
 
+            for link in top_links:
+                try:
+                    details = fetch_product_details(link)
+                    for i in search_results[1]:
+                        details[i] = search_results[1][i]
+                    current_details.append(details)
+                except:
+                    continue
+        product_details += current_details
+        liking_details += current_details
+        random.shuffle(product_details)
         return render_template("index.html", entries=entries,product_details=product_details)
 
     else:
         entries=[]
-        return render_template("index.html", entries=entries,  top_links=[])
+        print(product_details)
+        return render_template("index.html", entries=entries,  product_details=product_details)
 
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    global final_preferences
-    
-    
+
+    global final_preferences, history_details, product_details, entries
+
+    session.clear()
+    final_preferences = {
+        'color': "",
+        'size': "M",
+        'gender': "",
+        'name': "",
+        'location': "",
+        'age': 25,
+    }
+    product_details = list()
+    entries = list()
+
     session.clear()
 
     if request.method == "POST":
@@ -151,7 +203,15 @@ def login():
             return apology("invalid username and/or password", 403)
 
         session["user_id"] = rows[0][0]
-        
+
+        db.execute("SELECT gender from USER where id = ?",(rows[0][0],))
+        final_preferences["gender"] = db.fetchone()[0]
+
+        db.execute("SELECT age from USER where id = ?", (rows[0][0],))
+        final_preferences["age"] = db.fetchone()[0]
+
+        db.execute("SELECT name from USER where id = ?", (rows[0][0],))
+        final_preferences["name"] = db.fetchone()[0]
         # Extracting previous data 
         
         # Query History table
@@ -162,17 +222,48 @@ def login():
         # Query Likings table
         db.execute('SELECT * FROM Likings')
         likings_data = db.fetchall()
-        
+
+
         
         # Updating using user data 
         for history_row in history_data:
             color, items, size, brands = history_row[2:6]
-            print(color,items,size,brands)
             final_preferences['color'] = color
-            final_preferences['items'].extend(items.split(','))
-            final_preferences['brands'].extend(brands.split(','))
+            history_items = (items.split(','))
+            history_brands = (brands.split(','))
             final_preferences['size'] = size
+            print(history_brands,history_items)
+            for i in history_items:
+                for j in history_brands:
+                    user_preferences ={}
+                    user_preferences["items"] = i
+                    user_preferences["brand"] = j
+                    user_preferences["color"] = color
+                    user_preferences["size"] = size
+                    search_results_list = search_flipkart(user_preferences,final_preferences)
+                    # print(search_results_list)
 
+                    # Extracting information from flipkart link to display on webpage
+                    top_links = []
+                    current_details = []
+                    for search_results in search_results_list:
+                        products = search_results[0].find_all('div', {'class': '_1AtVbE'})
+                        for product in products:
+                            link_element = product.find('a', {'class': 'IRpwTa'})
+                            if link_element:
+                                link = 'https://www.flipkart.com' + link_element['href']
+                                top_links.append(link)
+
+                        for link in top_links:
+                            try:
+                                details = fetch_product_details(link)
+                                for i in search_results[1]:
+                                    details[i] = search_results[1][i]
+                                current_details.append(details)
+                            except:
+                                continue
+                    history_details += current_details
+                    product_details += current_details
         # for likings_row in likings_data:
         #     color, dont_recommend, items = likings_row[2:5]
         #     final_preferences['color'] = color
@@ -185,12 +276,12 @@ def login():
     else:
         return render_template("login.html")
 
- 
+
 @app.route("/logout")
 def logout():
     
-    global final_preferences
-    
+    global final_preferences, product_details, entries
+
     # Connect to the database
     conn = sqlite3.connect('fashion_database.db')
     cursor = conn.cursor()
@@ -227,6 +318,16 @@ def logout():
     conn.commit()
     conn.close()
     session.clear()
+    final_preferences = {
+        'color': "",
+        'size': "M",
+        'gender': "",
+        'name': "",
+        'location': "",
+        'age': 25,
+    }
+    product_details = list()
+    entries = list()
     return redirect("/index")
 
 
@@ -311,5 +412,84 @@ def history():
         return render_template('history.html')
 
 
+array_fashion = trend_check()
+def trends():
+    global trends_details, product_details
+    ans = []
+    for q_srch in range(0, len(array_fashion)):
+        try:
+            x = (instagram(q_srch))
+            print(x)
+            ans.append(x)
+        except:
+            continue
+
+    ans.sort(key=lambda x:x[1])
+    ans = ans[:5]
+    for j in ans[::-1]:
+        user_preferences = {}
+        user_preferences["items"] = j[0]
+        search_results_list = search_flipkart(user_preferences,final_preferences)
+
+        # Extracting information from flipkart link to display on webpage
+        top_links = []
+        current_details = []
+        for search_results in search_results_list:
+            products = search_results[0].find_all('div', {'class': '_1AtVbE'})
+            for product in products:
+                link_element = product.find('a', {'class': 'IRpwTa'})
+                if link_element:
+                    link = 'https://www.flipkart.com' + link_element['href']
+                    top_links.append(link)
+
+            for link in top_links:
+                try:
+                    details = fetch_product_details(link)
+                    for i in search_results[1]:
+                        details[i] = search_results[1][i]
+                    current_details.append(details)
+                except:
+                    continue
+        trends_details += current_details
+        product_details += current_details
+
+
+def special_occasion():
+    global occasion_details, product_details
+    d = festives()
+    for i in d:
+        current=datetime.datetime.now()
+        # print(i,current.month)
+        if i["month"] == current.month:
+            for j in i["items"]:
+                user_preferences = {}
+                user_preferences["items"] = j
+                search_results_list = search_flipkart(user_preferences,final_preferences)
+
+                # Extracting information from flipkart link to display on webpage
+                top_links = []
+                current_details = []
+                for search_results in search_results_list:
+                    products = search_results[0].find_all('div', {'class': '_1AtVbE'})
+                    for product in products:
+                        link_element = product.find('a', {'class': 'IRpwTa'})
+                        if link_element:
+                            link = 'https://www.flipkart.com' + link_element['href']
+                            top_links.append(link)
+
+                    for link in top_links:
+                        try:
+                            details = fetch_product_details(link)
+                            for i in search_results[1]:
+                                details[i] = search_results[1][i]
+                            current_details.append(details)
+                        except:
+                            continue
+                occasion_details += current_details
+                product_details += current_details
+
+
 if __name__ == '__main__':
+    #special_occasion()
+    #trends()
     app.run(host='0.0.0.0',port = 8080, debug=True)
