@@ -101,7 +101,7 @@ def index():
 
         # Taking user input 
         s = request.form.get("Entry")
-        entries.append("USER : "+s)
+        entries.append(["USER : "+s,1])
 
         # Generating bot's response
         # response_of_bot = fashion_chatbot.respond(str(s))

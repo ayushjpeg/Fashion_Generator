@@ -138,10 +138,10 @@ def set_user_preferences(entries,user_preferences,s):
                     dont_check3 = nltk.re.search("do not", str(s).lower())
                     if dont_check1 or dont_check2 or dont_check3:
                         user_preferences["dont_recommend"] = item
-                        entries.append(f"I'll make sure i dont show you {item}.")
+                        entries.append([f"I'll make sure i dont show you {item}.",0])
                     else:
                         user_preferences["items"] = item
-                        entries.append(f"I'll remember that you like {item}.")
+                        entries.append([f"I'll remember that you like {item}.",0])
                         for item in Fashion_array()[1]:
                             match = nltk.re.search(item.lower(), str(s).lower())
                             if match:
@@ -150,10 +150,10 @@ def set_user_preferences(entries,user_preferences,s):
                                 dont_check3 = nltk.re.search("do not", str(s).lower())
                                 if dont_check1 or dont_check2 or dont_check3:
                                     user_preferences["dont_recommend"] = item
-                                    entries.append(f"I'll make sure i dont show you {item}.")
+                                    entries.append([f"I'll make sure i dont show you {item}.",0])
                                 else:
                                     user_preferences["color"] = item
-                                    entries.append(f"Got it! {item} is your favorite color.")
+                                    entries.append([f"Got it! {item} is your favorite color.",0])
                                     break
                         for item in Fashion_array()[2]:
                             match = nltk.re.search(item.lower(), str(s).lower())
@@ -163,10 +163,10 @@ def set_user_preferences(entries,user_preferences,s):
                                 dont_check3 = nltk.re.search("do not", str(s).lower())
                                 if dont_check1 or dont_check2 or dont_check3:
                                     user_preferences["dont_recommend"] = item
-                                    entries.append(f"I'll make sure i dont show you {item}. Products")
+                                    entries.append([f"I'll make sure i dont show you {item}. Products",0])
                                 else:
                                     user_preferences["brand"] = item
-                                    entries.append(f"I will include {item} products.")
+                                    entries.append([f"I will include {item} products.",0])
                                     break
                         match = nltk.re.search("less", str(s).lower())
                         if match:
