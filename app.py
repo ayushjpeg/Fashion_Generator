@@ -83,7 +83,6 @@ def front():
         'location': "",
         'age': 25,
     }
-    product_details = list()
     entries = list()
     return render_template("front.html")
 
@@ -109,7 +108,7 @@ def index():
         
         
         # Updating user_preferences as per the conversation
-        entries, user_preferences = set_user_preferences(entries, {},str(s))
+        entries, user_preferences = set_user_preferences(entries, final_preferences,str(s))
 
         
         if "dont_recommend" in user_preferences:
@@ -170,7 +169,6 @@ def login():
     session.clear()
     final_preferences = {
         'color': "",
-        'size': "M",
         'gender': "",
         'name': "",
         'location': "",
@@ -215,13 +213,13 @@ def login():
         # Extracting previous data 
         
         # Query History table
-        db.execute('SELECT * FROM History')
+        db.execute('SELECT * FROM History where user_id=?',(rows[0][0],))
         history_data = db.fetchall()
         print(history_data)
         
-        # Query Likings table
-        db.execute('SELECT * FROM Likings')
-        likings_data = db.fetchall()
+        # # Query Likings table
+        # db.execute('SELECT * FROM Likings')
+        # likings_data = db.fetchall()
 
 
         
@@ -231,7 +229,7 @@ def login():
             final_preferences['color'] = color
             history_items = (items.split(','))
             history_brands = (brands.split(','))
-            final_preferences['size'] = size
+            final_preferences['brand'] = history_brands[-1]
             print(history_brands,history_items)
             for i in history_items:
                 for j in history_brands:
@@ -493,15 +491,15 @@ def occassion():
     if request.method == "POST":
         return redirect('/index')
     else:
-        return render_template('occassion.html',occasion_details=occasion_details,product_details=product_details)
+        return render_template('occassion.html',occasion_details=occasion_details)
 
 @app.route('/trends', methods=["GET", "POST"])
-def trends():
+def trending():
     global trends_details, product_details
     if request.method == "POST":
         return redirect('/index')
     else:
-        return render_template('trends.html',trends_details=trends_details,product_details=product_details)
+        return render_template('trends.html',trends_details=trends_details)
 
 @app.route('/liking', methods=["GET", "POST"])
 def liking():

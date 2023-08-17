@@ -40,7 +40,7 @@
     const productsContainer = document.getElementById('products-container');
 
     const productDetails = [
-        {% for details in product_details %}
+        {% for details in liking_details %}
             {
                 title: "{{ details.title }}",
                 price: "{{ details.price }}",
