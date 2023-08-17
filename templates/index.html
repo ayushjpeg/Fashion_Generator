@@ -7,14 +7,21 @@
 {% block main %}
 <div style="display: flex;">
     <div style="flex: 1; overflow-y: auto; max-height: 80vh; padding-right: 20px; direction: ltr;">
+        <!-- Modify the 'Recent Entries' section to include avatars -->
         <div style="background-color: #f7f7f7; padding: 20px; border-radius: 10px;">
             <h2 style="margin-bottom: 10px;">Recent Entries</h2>
             {% for entry in entries %}
-                <div style="border-bottom: 1px solid #ccc; padding-bottom: 10px; margin-bottom: 10px; white-space: nowrap; direction: ltr">
-                    {{ entry }}
+                <div style="display: flex; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 10px; margin-bottom: 10px; white-space: nowrap; direction: ltr">
+                    {% if entry[1] == 1 %}
+                        <img src="/static/images/useravatar.png" alt="User Avatar" style="width: 30px; height: 30px; margin-right: 10px;">
+                    {% else %}
+                        <img src="/static/images/botavatar.png" alt="Bot Avatar" style="width: 30px; height: 30px; margin-right: 10px;">
+                    {% endif %}
+                    {{ entry[0] }}
                 </div>
             {% endfor %}
         </div>
+
         <form method="post">
             <fieldset>
                 <div class="form-group" style="margin-top: -100px; direction: ltr";>
