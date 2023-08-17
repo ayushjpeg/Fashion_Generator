@@ -84,7 +84,7 @@ def festives():
     {
         "name": "Independence Day",
         "month": 8,
-        "items": ["Tri-color clothing", "Flag accessories"],
+        "items": ["Independence day dress"],
     },
     {
         "name": "Eid al-Adha",
