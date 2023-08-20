@@ -83,7 +83,6 @@ def front():
         'location': "",
         'age': 25,
     }
-    product_details = list()
     entries = list()
     return render_template("front.html")
 
@@ -218,11 +217,7 @@ def login():
         # Query History table
         db.execute('SELECT * FROM History where user_id=?',(rows[0][0],))
         history_data = db.fetchall()
-        print(history_data)
-        
-        # Query Likings table
-        db.execute('SELECT * FROM Likings')
-        likings_data = db.fetchall()
+
 
 
         
@@ -232,8 +227,8 @@ def login():
             final_preferences['color'] = color
             history_items = (items.split(','))
             history_brands = (brands.split(','))
-            final_preferences['size'] = size
-            print(history_brands,history_items)
+            final_preferences['brand'] = history_brands[-1]
+            # print(history_brands,history_items)
             for i in history_items:
                 for j in history_brands:
                     user_preferences ={}
