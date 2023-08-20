@@ -15,6 +15,8 @@ import numpy as np
 from pandas import json_normalize
 import pickle
 import ipyplot
+import sklearn
+import keras
 
 
 import nltk
@@ -256,7 +258,7 @@ def garment_advice(attr1 , attr2, k=10):
 
 user_input = input("Enter your fashion query: ").lower()
 
-def main():
+def chat():
     user_input = input("Enter your fashion query: ").lower()
 
     if is_question(user_input):
@@ -274,5 +276,3 @@ def main():
     else:
         print("I'm not sure what you're asking. Can you please rephrase your question or query?")
 
-if __name__ == "__main__":
-    main()

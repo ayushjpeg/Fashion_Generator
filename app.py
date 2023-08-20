@@ -6,10 +6,11 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import sqlite3
 import random
 import datetime
-from helpers import apology, login_required, fetch_product_details, search_flipkart, set_user_preferences
+from helpers import apology, login_required, fetch_product_details, search_flipkart, set_user_preferences, probabilistic_ranking_with_array
 from support import Fashion_array, trend_check
 from Special_occassion import festives
 from Trends_extraction import instagram
+from chatbot import chat
 
 # Configure application
 app = Flask(__name__, static_folder='static', template_folder='templates')
@@ -41,15 +42,14 @@ trends_details = []
 occasion_details = []
 liking_details = []
 flag = 0
+fashion_patterns = trend_check()
 
 
 
-# nltk replies
-# fashion_patterns = Fashion_array()
 
 final_preferences = {
     'color':"",
-    'size':"M",
+    'size':"",
     'gender':"",
     'name':"",
     'location':"",
@@ -58,7 +58,7 @@ final_preferences = {
 
 
 # Chatbot config
-# fashion_chatbot = Chat(fashion_patterns, reflections)
+fashion_chatbot = chat(fashion_patterns, reflections)
 
 
 # Ensuring responses are not cached
@@ -77,13 +77,12 @@ def front():
     session.clear()
     final_preferences = {
         'color': "",
-        'size': "M",
+        'size': "",
         'gender': "",
         'name': "",
         'location': "",
         'age': 25,
     }
-    product_details = list()
     entries = list()
     return render_template("front.html")
 
@@ -104,12 +103,12 @@ def index():
         entries.append(["USER : "+s,1])
 
         # Generating bot's response
-        # response_of_bot = fashion_chatbot.respond(str(s))
-        # entries.append("BOT : "+response_of_bot)
+        response_of_bot = fashion_chatbot.respond(str(s))
+        entries.append("BOT : "+response_of_bot)
         
         
         # Updating user_preferences as per the conversation
-        entries, user_preferences = set_user_preferences(entries, {},str(s))
+        entries, user_preferences = set_user_preferences(entries, final_preferences,str(s))
 
         
         if "dont_recommend" in user_preferences:
@@ -125,6 +124,8 @@ def index():
                 else:
                     temp.append(i)
             product_details = list(temp)
+            user_preferences.pop("dont_recommend")
+            return render_template("index.html", entries=entries, product_details=product_details)
 
         # Generating flipkart buy link as per the preference
         search_results_list = search_flipkart(user_preferences,final_preferences)
@@ -170,7 +171,6 @@ def login():
     session.clear()
     final_preferences = {
         'color': "",
-        'size': "M",
         'gender': "",
         'name': "",
         'location': "",
@@ -215,13 +215,9 @@ def login():
         # Extracting previous data 
         
         # Query History table
-        db.execute('SELECT * FROM History')
+        db.execute('SELECT * FROM History where user_id=?',(rows[0][0],))
         history_data = db.fetchall()
-        print(history_data)
-        
-        # Query Likings table
-        db.execute('SELECT * FROM Likings')
-        likings_data = db.fetchall()
+
 
 
         
@@ -231,8 +227,8 @@ def login():
             final_preferences['color'] = color
             history_items = (items.split(','))
             history_brands = (brands.split(','))
-            final_preferences['size'] = size
-            print(history_brands,history_items)
+            final_preferences['brand'] = history_brands[-1]
+            # print(history_brands,history_items)
             for i in history_items:
                 for j in history_brands:
                     user_preferences ={}
@@ -264,12 +260,7 @@ def login():
                                 continue
                     history_details += current_details
                     product_details += current_details
-        # for likings_row in likings_data:
-        #     color, dont_recommend, items = likings_row[2:5]
-        #     final_preferences['color'] = color
-        #     final_preferences['dont_recommend'].extend(dont_recommend.split(','))
-        #     final_preferences['items'].extend(items.split(','))
-            
+
         conn.close()
         
         return redirect("/index")
@@ -289,18 +280,18 @@ def logout():
     # Retrieve user_id from session
     user_id = session['user_id']
 
-    # # Update History table
-    # history_keys = ['style', 'color', 'items', 'size', 'brands']
-    # history_entry = {key: final_preferences.get(key, '') for key in history_keys}
-    # style = history_entry.get('style', '')
-    # color = history_entry.get('color', '')
-    # items = ','.join(history_entry.get('items', []))
-    # size = history_entry.get('size', '')
-    # brands = ','.join(history_entry.get('brands', []))
-    # cursor.execute('''
-    #     INSERT OR REPLACE INTO History (user_id, style, color, items, size, brands)
-    #     VALUES (?, ?, ?, ?, ?, ?)
-    # ''', (user_id, style, color, items, size, brands))
+    # Update History table
+    history_keys = ['style', 'color', 'items', 'size', 'brands']
+    history_entry = {key: final_preferences.get(key, '') for key in history_keys}
+    style = history_entry.get('style', '')
+    color = history_entry.get('color', '')
+    items = ','.join(history_entry.get('items', []))
+    size = history_entry.get('size', '')
+    brands = ','.join(history_entry.get('brands', []))
+    cursor.execute('''
+        INSERT OR REPLACE INTO History (user_id, style, color, items, size, brands)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', (user_id, style, color, items, size, brands))
 
     # Update Likings table
     likings_keys = ['color', 'location', 'dont_recommend', 'items']
@@ -320,7 +311,7 @@ def logout():
     session.clear()
     final_preferences = {
         'color': "",
-        'size': "M",
+        'size': "",
         'gender': "",
         'name': "",
         'location': "",
@@ -394,7 +385,7 @@ def history():
 
         items_str = ','.join(items)
         brands_str = ','.join(brands)
-        print(color,items,size,brands)
+        # print(color,items,size,brands)
         cursor.execute('''
             INSERT OR REPLACE INTO History (user_id, style, color, items, size, brands)
             VALUES (?, ?, ?, ?, ?, ?)
@@ -403,7 +394,7 @@ def history():
         # Print inserted data for testing
         cursor.execute("SELECT * FROM History WHERE user_id = ?", (user_id,))
         inserted_data = cursor.fetchone()
-        print("Inserted Data:", inserted_data)
+        #  print("Inserted Data:", inserted_data)
         conn.commit()
         conn.close()
 
@@ -419,7 +410,7 @@ def trends():
     for q_srch in range(0, len(array_fashion)):
         try:
             x = (instagram(q_srch))
-            print(x)
+            # print(x)
             ans.append(x)
         except:
             continue
@@ -493,15 +484,15 @@ def occassion():
     if request.method == "POST":
         return redirect('/index')
     else:
-        return render_template('occassion.html',occasion_details=occasion_details,product_details=product_details)
+        return render_template('occassion.html',occasion_details=occasion_details)
 
 @app.route('/trends', methods=["GET", "POST"])
-def trends():
+def trending():
     global trends_details, product_details
     if request.method == "POST":
         return redirect('/index')
     else:
-        return render_template('trends.html',trends_details=trends_details,product_details=product_details)
+        return render_template('trends.html',trends_details=trends_details)
 
 @app.route('/liking', methods=["GET", "POST"])
 def liking():
@@ -513,6 +504,6 @@ def liking():
         
 
 if __name__ == '__main__':
-    #special_occasion()
-    #trends()
+    special_occasion()
+    trends()
     app.run(host='0.0.0.0',port = 8080, debug=True)

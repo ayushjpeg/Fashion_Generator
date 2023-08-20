@@ -47,6 +47,21 @@ def fetch_product_details(link):
         'link' : link,
     }
 
+
+def probabilistic_ranking_with_array(item_list, probability_array):
+    ranked_items = {}
+
+    for idx, probabilities in enumerate(probability_array, start=1):
+        total_probability = sum(probabilities)
+        average_probability = total_probability / len(probabilities)
+
+        for item, probability in zip(item_list, probabilities):
+            ranked_items[item] = ranked_items.get(item, 0) + probability / average_probability * idx
+
+    sorted_items = sorted(ranked_items.items(), key=lambda x: x[1], reverse=True)
+    final_ranked_items = {item[0]: rank for rank, (item, _) in enumerate(sorted_items, start=1)}
+
+    return final_ranked_items
 def search_flipkart(final_preferences,global_info):
         print(final_preferences)
         collection = []

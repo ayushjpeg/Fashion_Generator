@@ -3,6 +3,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 import time
+import requests
 from support import trend_check
 insta = []
 faceb = []
@@ -46,4 +47,31 @@ def instagram(q_srch):
     curr.append(anchors[3].text)
     
     return curr
-    
+
+
+def pinterest(url, element_name):
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        content = response.content
+        soup = BeautifulSoup(content, 'html.parser')
+
+        element_count = len(soup.find_all(element_name))
+        return element_count
+    else:
+        print("Failed to fetch the webpage")
+        return None
+
+
+def fashion_blogs(url, element_name):
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        content = response.content
+        soup = BeautifulSoup(content, 'html.parser')
+
+        element_count = len(soup.find_all(element_name))
+        return element_count
+    else:
+        print("Failed to fetch the webpage")
+        return None
